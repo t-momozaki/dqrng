@@ -5,8 +5,14 @@ dqrng_dqrMNorm <- function(mu = 0, Sigma1, Sigma2) {
   p <- ncol(Sigma1)
   n <- ncol(Sigma2)
   
-  U <- base::chol(base::kronecker(Sigma1,Sigma2), pivot = TRUE)
-  U <- U[, order(attr(U, "pivot"))]
+  Ua <- base::chol(Sigma1, pivot = TRUE)
+  Ua <- Ua[, order(attr(Ua, "pivot"))]
   
-  matrix(base::crossprod(U,dqrng_dqrnorm(n*p,as.vector(mu))),n,p)
+  Ub <- base::chol(Sigma2, pivot = TRUE)
+  Ub <- Ub[, order(attr(Ub, "pivot"))]
+  
+  # U <- base::kronecker(Ua, Ub)
+  # matrix(base::crossprod(U,dqrng_dqrnorm(n*p,as.vector(mu))),n,p)
+  
+  t(Ub) %*% matrix(dqrng_dqrnorm(n*p,as.vector(mu)),n,p) %*% Ua
 }
